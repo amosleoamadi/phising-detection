@@ -1,5 +1,5 @@
 from app.predict import predict_text
-from predict_url import predict_url
+from app.predict_url import predict_url
 
 from app.utils.helpers import is_url
 

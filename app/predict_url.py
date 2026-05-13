@@ -1,5 +1,5 @@
 import joblib
-from utils.url_features import extract_url_features
+from app.utils.url_features import extract_url_features
 
 
 # Load the trained model and vectorizer
