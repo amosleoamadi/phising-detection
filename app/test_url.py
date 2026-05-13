@@ -32,8 +32,8 @@ accuracy = model.score(X_test, y_test)
 
 print("Accuracy:", accuracy)
 
-joblib.dump(model, "models/model.pkl")
-joblib.dump(vectorizer, "models/vectorizer.pkl")
+joblib.dump(model, "models/url_model.pkl")
+joblib.dump(vectorizer, "models/url_vectorizer.pkl")
 
 print(data.head())
 print(data.columns)

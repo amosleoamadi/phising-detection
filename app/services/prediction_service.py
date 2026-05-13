@@ -1,25 +1,27 @@
+# app/services/prediction_service.py
+
 from app.predict import predict_text
 from app.predict_url import predict_url
-
 from app.utils.helpers import is_url
 
 
-def predict_message(message: str):
+def predict_input(text: str):
 
-    # URL detection
-    if is_url(message):
+    # URL PATH
+    if is_url(text):
+        result = predict_url(text)
 
-        result = predict_url(message)
+        return {
+            "type": "url",
+            "result": result,
+            "prediction": "The URL is likely phishing." if result == "phishing" else "The URL is safe."
+        }
 
-        if result == "phishing":
-            return "phishing"
+    # TEXT PATH
+    result = predict_text(text)
 
-        return "safe"
-
-    # Text detection
-    result = predict_text(message)
-
-    if result == "spam":
-        return "phishing"
-
-    return "safe"
+    return {
+        "type": "text",
+        "result": result,
+        "prediction": "The message is likely phishing." if result == "spam" else "The message is safe."
+    }
