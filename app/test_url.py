@@ -1,40 +1,40 @@
+# train_url_model.py
 import pandas as pd
-from utils.url_features import extract_url_features
+import joblib
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-import joblib
+from sklearn.metrics import classification_report
+from app.utils.url_features import extract_url_features
 
-data = pd.read_csv("dataset/Dataset.csv")
+# Load your dataset
+df = pd.read_csv("dataset/url_dataset.csv")  # has columns: URL, features..., Results
 
-urls = data["url"]
-labels = data["label"]
+# Extract features and labels using your OWN extractor
+print("Extracting features from URLs... (this may take a moment)")
+features_list = []
+for url in df['URL']:
+    features_list.append(extract_url_features(url))
 
-features = [extract_url_features(url) for url in urls]
+# Use DictVectorizer to convert dicts to matrix
 vectorizer = DictVectorizer(sparse=False)
+X = vectorizer.fit_transform(features_list)
+y = df['Results'].values
 
-X = vectorizer.fit_transform(features)
-
-y = labels
-
+# Split
 X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42
+    X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-model = LogisticRegression()
-
+# Train with class balancing
+model = RandomForestClassifier(n_estimators=100, class_weight='balanced', random_state=42)
 model.fit(X_train, y_train)
 
-accuracy = model.score(X_test, y_test)
+# Evaluate
+print("\nClassification Report:\n", classification_report(y_test, model.predict(X_test)))
 
-print("Accuracy:", accuracy)
-
+# Save model and vectorizer
 joblib.dump(model, "models/url_model.pkl")
 joblib.dump(vectorizer, "models/url_vectorizer.pkl")
 
-print(data.head())
-print(data.columns)
-print(labels)
+print("\nModel and vectorizer saved successfully!")
